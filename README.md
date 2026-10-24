@@ -76,35 +76,3 @@ python app.py
 
 Visit <http://127.0.0.1:5000>.
 
-No MySQL setup is needed. The app creates `team.db` and inserts sample members automatically on first run.
-
-## GitHub upload instructions
-
-1. Sign in to GitHub and create a repository named `team-lite`.
-2. Extract this ZIP on your computer.
-3. Open the extracted folder. Upload the **contents** of the folder to the repository, including `app.py`, `requirements.txt`, `.gitignore`, `.env.example`, `LICENSE`, `README.md`, `templates/`, and `static/`.
-4. Do **not** upload `venv/`, `team.db`, or any passwords/secrets.
-5. Commit the files to the `main` branch.
-
-### Upload using Git (optional)
-
-Run these commands in the project folder after creating an empty GitHub repository. Replace `YOUR-USERNAME` with your GitHub username.
-
-```bat
-git init
-git add .
-git commit -m "Initial commit: TeamLite availability tracker"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/team-lite.git
-git push -u origin main
-```
-
-If Git asks you to sign in, complete the GitHub authentication prompt.
-
-## Deployment note
-
-This project is intended as a learning/demo project. Before deploying publicly, configure a secure secret key, turn off Flask debug mode, and use a hosting service with persistent storage for SQLite. For multi-user production deployments, add authentication and authorization.
-
-## License
-
-Released under the MIT License. See `LICENSE`.
