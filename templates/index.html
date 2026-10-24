@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple dashboard to manage team availability.">
+  <title>TeamLite — Team Availability</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-icon">✦</span> TeamLite</a>
+    <span class="live-pill"><span class="live-dot"></span> Team dashboard</span>
+  </header>
+
+  <main class="container">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">WORKSPACE / OVERVIEW</p>
+        <h1>Team availability</h1>
+        <p class="muted">A simple view of who's available, busy, or away.</p>
+      </div>
+      <a class="button" href="#add-member">＋ Add member</a>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-area">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="stats-grid" aria-label="Team statistics">
+      <article class="stat-card">
+        <div class="stat-head"><span>Total members</span><span class="stat-icon violet">♙</span></div>
+        <strong class="stat-number">{{ total }}</strong><small>People in your workspace</small>
+      </article>
+      <article class="stat-card">
+        <div class="stat-head"><span>Available</span><span class="stat-icon green">✓</span></div>
+        <strong class="stat-number">{{ counts['Available'] }}</strong><small class="green-text">Ready to collaborate</small>
+      </article>
+      <article class="stat-card">
+        <div class="stat-head"><span>Busy</span><span class="stat-icon orange">◷</span></div>
+        <strong class="stat-number">{{ counts['Busy'] }}</strong><small class="orange-text">Focus time</small>
+      </article>
+      <article class="stat-card">
+        <div class="stat-head"><span>Away</span><span class="stat-icon gray">☾</span></div>
+        <strong class="stat-number">{{ counts['Away'] }}</strong><small>Currently away</small>
+      </article>
+    </section>
+
+    <section class="panel" id="team-members">
+      <div class="panel-heading">
+        <div><h2>Team members</h2><p class="muted">Manage status and keep everyone up to date.</p></div>
+        <span class="member-count">{{ members|length }} shown</span>
+      </div>
+      <form class="filters" method="get" action="{{ url_for('dashboard') }}">
+        <label class="search-box"><span aria-hidden="true">⌕</span><input type="search" name="search" value="{{ search }}" placeholder="Search name or role..." aria-label="Search by name or role"></label>
+        <select name="status" aria-label="Filter by status">
+          {% for option in ['All', 'Available', 'Busy', 'Away'] %}
+            <option value="{{ option }}" {% if status_filter == option %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+        <button class="button" type="submit">Search</button>
+        <a class="button button-light" href="{{ url_for('dashboard') }}">Reset</a>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>TEAM MEMBER</th><th>ROLE</th><th>STATUS</th><th>UPDATE STATUS</th><th></th></tr></thead>
+          <tbody>
+            {% for member in members %}
+              <tr>
+                <td><div class="person"><span class="avatar">{{ member['name'][0]|upper }}</span><strong>{{ member['name'] }}</strong></div></td>
+                <td class="role">{{ member['role'] }}</td>
+                <td><span class="status-badge {{ member['status']|lower }}">{{ member['status'] }}</span></td>
+                <td>
+                  <form class="status-form" method="post" action="{{ url_for('update_status', member_id=member['id']) }}">
+                    <select name="status" aria-label="Change status for {{ member['name'] }}">
+                      {% for option in ['Available', 'Busy', 'Away'] %}
+                        <option value="{{ option }}" {% if member['status'] == option %}selected{% endif %}>{{ option }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="save-button" type="submit">Save</button>
+                  </form>
+                </td>
+                <td><form method="post" action="{{ url_for('delete_member', member_id=member['id']) }}" onsubmit="return confirm('Delete this team member?')"><button class="delete-button" type="submit" aria-label="Delete {{ member['name'] }}" title="Delete member">×</button></form></td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5" class="empty-state"><strong>No members found</strong><span>Try another search or add a team member below.</span></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-footer"><span>TeamLite workspace</span><span>Data is saved locally <b>✓</b></span></div>
+    </section>
+
+    <section class="panel add-panel" id="add-member">
+      <div><h2>Add a team member</h2><p class="muted">Enter a name, role, and starting status.</p></div>
+      <form class="add-form" method="post" action="{{ url_for('add_member') }}">
+        <label>Full name<input name="name" required maxlength="100" placeholder="e.g. Neha Deshmukh"></label>
+        <label>Role<input name="role" maxlength="100" placeholder="e.g. Frontend Developer"></label>
+        <label>Initial status<select name="status"><option>Available</option><option>Busy</option><option selected>Away</option></select></label>
+        <button class="button" type="submit">＋ Add member</button>
+      </form>
+    </section>
+    <footer><span>© 2026 TeamLite</span><span>Built with Python Flask and SQLite</span></footer>
+  </main>
+</body>
+</html>
