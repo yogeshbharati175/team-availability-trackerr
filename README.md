@@ -1,4 +1,4 @@
-# TeamLite — Team Availability Tracker
+# Team Availability Tracker
 
 A beginner-friendly, responsive team dashboard built with **Python, Flask, SQLite, HTML, and CSS**. It lets you track who is Available, Busy, or Away without needing a MySQL server.
 
